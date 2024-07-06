@@ -78,14 +78,14 @@
 
   <!-- Floating Action Button -->
  <v-btn-toggle id='myFab' >
-          <!-- <v-btn class = 'button-play-pause' @click = "selectPlayBlackOut('play')">
+          <v-btn class = 'button-play-pause' @click = "selectPlayBlackOut('play')">
             <v-icon>mdi-play</v-icon>
             play
-          </v-btn> -->
+          </v-btn>
 
           <v-btn class = 'button-play-pause' @click = "selectPlayBlackOut('blackout')">
             <v-icon>mdi-stop</v-icon>
-            blackout
+            dark
           </v-btn>
         </v-btn-toggle>
     
@@ -182,7 +182,7 @@
 }
 #myFab{
   position:absolute;
-  right:50px;
+  right:10px;
   bottom:20px;
   color: black;
 }

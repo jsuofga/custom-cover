@@ -14,7 +14,7 @@
                           </v-row>
                       </v-container>
                  </v-app-bar-title>
-                <v-chip>2.0</v-chip>
+                <v-chip>2.1</v-chip>
                 <v-btn icon="mdi-upload" @click= "this.$router.push('/accesscontrol')"></v-btn>
 
   </v-app-bar>
