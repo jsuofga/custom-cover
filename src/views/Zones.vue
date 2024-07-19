@@ -6,15 +6,19 @@
           <img src="@/assets/cover_logo.png " width="300">
       </v-row>
       <v-row >
-          <v-col  class = " d-flex justify-end ma-6 ">
+          <v-col  class = " d-flex justify-center ma-6 ">
               <button class = "button-round" @click = "selectZone('patio')">Patio</button>
           
           </v-col>
-          <v-col  class = " d-flex justify-start ma-6 ">
+          <v-col  class = " d-flex justify-center ma-6 ">
               <button class = "button-round" @click = "selectZone('main')">Main</button>
+          </v-col>
+            <v-col  class = " d-flex justify-center ma-6 ">
+              <button class = "button-round" @click = "selectZone('all')">All</button>
           </v-col>
 
       </v-row>
+
     </v-col>
 
   </v-container>
@@ -43,6 +47,10 @@
       }else if(_zone == 'main'){
           this.stateStore.changePage('main')
           this.$router.push('/main')
+      }else if(_zone =='all'){
+          this.stateStore.selectAll()
+          this.stateStore.rxSelectedLabel = 'ALL Displays'
+          this.$router.push('/videoinputs')
 
       }
     }

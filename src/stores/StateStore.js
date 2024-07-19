@@ -31,13 +31,19 @@ export const useStateStore = defineStore('stateStore', {
           22, 23, 24, 25, 26, 
         ],
       
-      
         rxIDs_main : [
           1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,17, 18,19,20,21
         ],
         rxIDs_patio : [
           22, 23, 24, 25, 26,
         ],
+
+        rxIDs_frontLeft_frontRight:[19,20],
+        rxIds_excluding_frontLeft_frontRight : [
+          1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,13,14, 15, 16,17, 18,21,
+          22, 23, 24, 25, 26, 
+        ],
+      
        
         rxIDs_to_fetch:[],
 
@@ -63,28 +69,51 @@ export const useStateStore = defineStore('stateStore', {
           this.page = _page
           console.log(this.page)
         },
-
         selectRX(_rxID) {
             this.rxSelected = _rxID
             this.mergeType = '1'
+
+        },
+        selectAll(){
+          this.rxSelected = 'all'
         },
 
          switchRX(_txID){
-          
           // console.log(`Type is ${this.mergeType}`)
           // console.log(`RX is ${this.rxSelected}`)
           console.log(_txID)
 
-          if(this.mergeType =='1'){  // Single TV mode
-             fetch(`http://172.31.3.${this.rxSelected}/cgi-bin/query.cgi?cmd=vw:off`);
-             fetch(`http://172.31.3.${this.rxSelected}/cgi-bin/query.cgi?cmd=rxswitch:${_txID}`)
-  
-          }else if(this.mergeType == '2' || this.mergeType == '3'|| this.mergeType == '4' || this.mergeType == '6' ){ // Merging 2TV, 3TVs or 4TVs
-            this.rxIdsToMerge.forEach((item,index)=>{
-              fetch(`http://172.31.3.${item}/cgi-bin/query.cgi?cmd=e%20e_vw_enable_0_${this.mergeType-1}_0_${index}%3Be%20e_vw_moninfo_200_200_100_100`)
+          if(this.rxSelected != 'all'){
+            if(this.mergeType =='1'){  // Single TV mode
+              fetch(`http://172.31.3.${this.rxSelected}/cgi-bin/query.cgi?cmd=vw:off`);
+              fetch(`http://172.31.3.${this.rxSelected}/cgi-bin/query.cgi?cmd=rxswitch:${_txID}`)
+   
+           }else if(this.mergeType == '2' || this.mergeType == '3'|| this.mergeType == '4' || this.mergeType == '6' ){ // Merging 2TV, 3TVs or 4TVs
+             this.rxIdsToMerge.forEach((item,index)=>{
+               fetch(`http://172.31.3.${item}/cgi-bin/query.cgi?cmd=e%20e_vw_enable_0_${this.mergeType-1}_0_${index}%3Be%20e_vw_moninfo_200_200_100_100`)
+               fetch(`http://172.31.3.${item}/cgi-bin/query.cgi?cmd=rxswitch:${_txID}`);
+             })
+           }
+
+          }else{
+
+            console.log('LL cool')
+            // merge 19 and 20 and switch to the input
+            this.rxIDs_frontLeft_frontRight.forEach((item,index)=>{
+              // console.log(`http://172.31.3.${item}/cgi-bin/query.cgi?cmd=e%20e_vw_enable_0_1_0_${index}%3Be%20e_vw_moninfo_200_200_100_100`)
+              // console.log(`http://172.31.3.${item}/cgi-bin/query.cgi?cmd=rxswitch:${_txID}`);
+              fetch(`http://172.31.3.${item}/cgi-bin/query.cgi?cmd=e%20e_vw_enable_0_1_0_${index}%3Be%20e_vw_moninfo_200_200_100_100`)
+              fetch(`http://172.31.3.${item}/cgi-bin/query.cgi?cmd=rxswitch:${_txID}`);
+            })
+
+            // switch everthing except 19,20 to input 
+            this.rxIds_excluding_frontLeft_frontRight.forEach((item,index)=>{
+              // console.log(`http://172.31.3.${item}/cgi-bin/query.cgi?cmd=rxswitch:${_txID}`);
               fetch(`http://172.31.3.${item}/cgi-bin/query.cgi?cmd=rxswitch:${_txID}`);
             })
           }
+
+  
           
         },
         play_blackout(_mode){
