@@ -80,7 +80,7 @@
     submit:function(){
       if(this.userInput ==='octava'){
         this.stateStore.isAuthenticated = true
-        this.$router.push('/update')
+        this.$router.push('/settingsmenu')
       }else{
           
       }

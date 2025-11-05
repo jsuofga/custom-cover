@@ -84,6 +84,44 @@ const routes = [
     ],
   },
   {
+    path: '/ipaddressinput',
+    component: () => import('@/layouts/default/Default.vue'),
+    children: [
+      {
+        path: '/ipaddressinput',
+        name: 'IpAddressInput',
+        // route level code-splitting
+        // this generates a separate chunk (about.[hash].js) for this route
+        // which is lazy-loaded when the route is visited.
+        component: () => import(/* webpackChunkName: "home" */ '@/views/IpAddressInput.vue'),
+        beforeEnter: (to, from, next) => {
+          const  StateStore = useStateStore(); // <-- passing Pinia instance directly
+          if (to.name !== 'AccessControl' && !StateStore.isAuthenticated) {
+            next({ name: 'AccessControl' });
+          } else {
+            next();
+          }
+        }
+      },
+    ],
+  },
+   {
+    path: '/settingsmenu',
+    component: () => import('@/layouts/default/Default.vue'),
+    children: [
+      {
+        path: '/settingsmenu',
+        name: 'SettingsMenu',
+        // route level code-splitting
+        // this generates a separate chunk (about.[hash].js) for this route
+        // which is lazy-loaded when the route is visited.
+        component: () => import(/* webpackChunkName: "home" */ '@/views/SettingsMenu.vue'),
+  
+      },
+    ],
+  },
+
+  {
     path: '/accesscontrol',
     component: () => import('@/layouts/default/Default.vue'),
     children: [

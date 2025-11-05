@@ -20,6 +20,14 @@ export const useStateStore = defineStore('stateStore', {
         nodeQueryList_ip:[],
         nodeQueryList_rx_ip:[],
         nodeQueryList_rx_not_found:[],
+        ipAddressOfCiscoSwitch:'',
+        ciscoSwitchModel: "CBS250-48",
+        txPorts: 10,
+        rxPorts: 38,  // tx + rx add up to 48 for PoE 
+        poe_wattage_used:1,
+        waiting_for_poe_to_turn_on: false,
+        snackbar_poe : false,
+        snakcbar_poe_text:'',
         rxIdsToMerge:[
           
         ],
@@ -64,6 +72,59 @@ export const useStateStore = defineStore('stateStore', {
      },
      actions: {
         // since we rely on `this`, we cannot use an arrow function
+                saveSwitchConfigToPi(_ip_mdf){
+          const serverURL = location.hostname
+          fetch(`http://${serverURL}:3000/write/UserSwitchConfig/{"ip":"${_ip_mdf}","model":"${this.ciscoSwitchModel}","TXports":${this.txPorts},"RXports":${this.rxPorts}}`)
+        },
+
+        get_UserSwitchConfig(){
+          const serverURL = `${location.hostname}:3000`
+          // Read from Server
+            fetch(`http://${serverURL}/read/UserSwitchConfig`, {method: 'GET',})
+            .then(response => response.json())
+            .then(result => {
+              console.log('Success:', result);
+              this.ipAddressOfCiscoSwitch = result['ip']
+
+            })
+            .catch(error => {
+              console.log('Error:', error);
+            });
+      },
+
+       power_poe(_onOff){
+
+        this.waiting_for_poe_to_turn_on = _onOff === 'on' ? true : false
+        this.snackbar_poe= true
+        this.snackbar_poe_text= _onOff === 'on' ? 'Powering PoE ON' : 'Powering PoE OFF'
+        const serverURL = `${location.hostname}:1880`
+        fetch(`http://${serverURL}/poe/${_onOff}`)
+
+       },
+
+        get_SwitchStatus(){
+        const serverURL_ciscoStat = `${location.hostname}:1880/ciscoStat`
+        console.log(`http://${serverURL_ciscoStat}`)
+        fetch(`http://${serverURL_ciscoStat}`)
+        .then(function(response) {
+            return response.json();
+        })
+        .then((myJson)=> {
+          console.log(myJson)
+          // this.portVlanMembership = myJson.PortVlanMembership
+          // this.ciscoSwitchModel = myJson.model
+          // this.piNotRespond = false
+          // console.log(this.portVlanMembership)
+          this.poe_wattage_used = myJson.PoE
+          console.log(this.poe_wattage_used)
+        })
+        .catch(()=> {
+            // this.piNotRespond = true
+            console.log('ERROR!'); 
+        })
+
+      },
+
         changePage(_page) {
          
           this.page = _page
@@ -97,8 +158,7 @@ export const useStateStore = defineStore('stateStore', {
 
           }else{
 
-            console.log('LL cool')
-            // merge 19 and 20 and switch to the input
+          // merge 19 and 20 and switch to the input
             this.rxIDs_frontLeft_frontRight.forEach((item,index)=>{
               // console.log(`http://172.31.3.${item}/cgi-bin/query.cgi?cmd=e%20e_vw_enable_0_1_0_${index}%3Be%20e_vw_moninfo_200_200_100_100`)
               // console.log(`http://172.31.3.${item}/cgi-bin/query.cgi?cmd=rxswitch:${_txID}`);
@@ -186,9 +246,8 @@ export const useStateStore = defineStore('stateStore', {
           this.rxParams[rx]['chSelect'] = 'not detected'
   
           })
-
+           this.getFeedback()
         },
-
       
          async getFeedback(){
      
@@ -239,8 +298,6 @@ export const useStateStore = defineStore('stateStore', {
 
                 }
               
-                 
-           
 
          },
             

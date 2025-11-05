@@ -11,8 +11,20 @@
             <v-btn color="green" @click = "selectPlayBlackOut('play')"> <v-icon>mdi-play</v-icon>Resume | Play</v-btn>
             </v-row>
         </v-col>
-   
     </v-banner>
+
+    <v-banner v-else-if= "stateStore.poe_wattage_used == 0" id='alert' lines="one" class = "d-flex justify-center" >
+        <v-col >
+          <v-row class = "d-flex justify-center pa-10">  
+            <div v-if = "stateStore.waiting_for_poe_to_turn_on == false" class = 'text-h5'>PoE Power is OFF</div>
+            <div v-else class = 'text-h5 text-green'>Wait...Powering Up</div>
+
+          </v-row>
+          <v-row class = "d-flex justify-center ">
+            <v-btn color="green" @click = "stateStore.power_poe('on')"> <v-icon>mdi-power</v-icon>Turn ON PoE Power</v-btn>
+          </v-row>
+        </v-col>
+     </v-banner>
    
     <v-row id='row-1' class="myRow">
       <v-col class="myCol d-flex justify-center"><StageProjectors :rxID_left = "19" :rxID_right = "20"/></v-col>
@@ -153,17 +165,20 @@
       }
 
     },
-  async created(){
-      console.log('start getRxStatus')
-      await this.stateStore.getNodeQuery() //call immediatly 1st 
-      this.stateStore.getFeedback()
-      this.getRxStatus = setInterval(this.stateStore.getFeedback,5000) //repeat. 
-      // this.snapShot = setInterval(this.changeBackgroundImage,2500)
+ async created(){
+      console.log('start getNodeQueryStatus')
+      this.stateStore.getNodeQuery() //call immediatly 1st 
+      this.getNodeQueryStatus = setInterval(this.stateStore.getNodeQuery,5000) //repeat. 
+      console.log('start getSwitchStatus')
+      this.getSwitchStatus = setInterval(this.stateStore.get_SwitchStatus,5000) //repeat. 
+
     },
     beforeUnmount(){
-      console.log('stop getRxStatus')
-      clearInterval(this.getRxStatus)
-      //clearInterval(this.snapShot)
+    
+      console.log('stop getNodeQueryStatus')
+      clearInterval(this.getNodeQueryStatus)
+      console.log('stop getSwitchStatus')
+      clearInterval(this.getSwitchStatus)
     }
 
   }
@@ -179,6 +194,8 @@
   left:25%;
   width:50%;
   height: 50%;
+  z-index: 10;
+
 }
 #myFab{
   position:absolute;
